@@ -96,6 +96,10 @@ class Core(object):
         config['api']['session.id'] = sess["session_id"]
         return sess["session_id"]
 
+    def build_image_url(self, img_path, img_size):
+            return config['api']['base.url'] + self.poster_sizes(img_size) + img_path
+
+
 class Movies(Core):
     def __init__(self, title="", limit=False, language=None):
         self.limit = limit
@@ -168,7 +172,7 @@ class Movie(Core):
             img_path = self.movies["belongs_to_collection"]["backdrop_path"]
         except KeyError:
             return
-        return config['api']['base.url']+self.poster_sizes(img_size)+img_path
+        return Core.build_image_url(img_path, img_size)
 
     # Sizes = s->w92 m->w185 l->w500 o->original(default)
     def get_collection_poster(self,img_size="o"):
@@ -176,7 +180,7 @@ class Movie(Core):
             img_path = self.movies["belongs_to_collection"]["poster_path"]
         except KeyError:
             return
-        return config['api']['base.url']+self.poster_sizes(img_size)+img_path
+        return Core.build_image_url(img_path, img_size)
 
     def get_budget(self):
         return self.movies['budget']
@@ -256,7 +260,7 @@ class Movie(Core):
         img_path = self.movies.get("poster_path")
         if not img_path:
             return
-        return config['api']['base.url']+self.poster_sizes(img_size)+img_path
+        return Core.build_image_url(img_path, img_size)
 
     def get_trailers(self, language=None):
         return self.getJSON(config['urls']['movie.trailers'] % self.movie_id, language=language)
