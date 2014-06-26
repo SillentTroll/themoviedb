@@ -19,7 +19,7 @@ import requests
 
 config = {}
 
-def configure(api_key, language='en'):
+def configure(api_key, language='en', secure=False):
     config['apikey'] = api_key
     config['language'] = language
     config['urls'] = {}
@@ -41,6 +41,7 @@ def configure(api_key, language='en'):
     config['urls']['session.id'] = "https://api.themoviedb.org/3/authentication/session/new?api_key=%(apikey)s&request_token=%%s" % (config)
     config['urls']['movie.add.rating'] = "https://api.themoviedb.org/3/movie/%%s/rating?session_id=%%s&api_key=%(apikey)s" % (config)
     config['api'] = {}
+    config['secure'] = secure
     config['api']['backdrop.sizes'] = ""
     config['api']['base.url'] = ""
     config['api']['poster.sizes'] = ""
@@ -65,7 +66,10 @@ class Core(object):
     def update_configuration(self):
         c = self.getJSON(config['urls']['config'])
         config['api']['backdrop.sizes'] = c['images']['backdrop_sizes']
-        config['api']['base.url'] = c['images']['base_url']
+        if config['secure']:
+            config['api']['base.url'] = c['images']['secure_base_url']
+        else:
+            config['api']['base.url'] = c['images']['base_url']
         config['api']['poster.sizes'] = c['images']['poster_sizes']
         config['api']['profile.sizes'] = c['images']['profile_sizes']
         return "ok"
